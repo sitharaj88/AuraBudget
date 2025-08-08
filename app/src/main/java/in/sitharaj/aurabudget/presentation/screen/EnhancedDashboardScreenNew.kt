@@ -74,8 +74,9 @@ fun EnhancedDashboardScreen(
             .fillMaxSize()
             .systemBarsPadding()
     ) {
-        // Top App Bar
-        TopAppBar(
+        // Top App Bar with Enhanced Settings
+        EnhancedTopAppBar(
+            navController = navController,
             title = {
                 Column {
                     Text("Good morning!")
@@ -85,18 +86,7 @@ fun EnhancedDashboardScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            },
-            actions = {
-                IconButton(onClick = { navController.navigate(Screen.Notifications.route) }) {
-                    Icon(Icons.Default.Notifications, contentDescription = "Notifications")
-                }
-                IconButton(onClick = { navController.navigate(Screen.Profile.route) }) {
-                    Icon(Icons.Default.AccountCircle, contentDescription = "Profile")
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+            }
         )
 
         LazyColumn(
@@ -235,5 +225,195 @@ fun EnhancedDashboardScreen(
                 Spacer(modifier = Modifier.height(80.dp))
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EnhancedTopAppBar(
+    navController: NavController,
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var showMoreMenu by remember { mutableStateOf(false) }
+    var showSearchBar by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+
+    if (showSearchBar) {
+        // Search Top App Bar
+        TopAppBar(
+            title = {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = { Text("Search transactions...") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    showSearchBar = false
+                    searchQuery = ""
+                }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Close search")
+                }
+            },
+            actions = {
+                IconButton(onClick = {
+                    // Handle search action
+                    if (searchQuery.isNotEmpty()) {
+                        navController.navigate("${Screen.Transactions.route}?search=$searchQuery")
+                    }
+                }) {
+                    Icon(Icons.Default.Search, contentDescription = "Search")
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            modifier = modifier
+        )
+    } else {
+        // Normal Top App Bar with Enhanced Actions
+        TopAppBar(
+            title = title,
+            actions = {
+                // Search Button
+                IconButton(onClick = { showSearchBar = true }) {
+                    Icon(Icons.Default.Search, contentDescription = "Search")
+                }
+
+                // Quick Filter Button
+                IconButton(onClick = { navController.navigate("${Screen.Transactions.route}?filter=recent") }) {
+                    Icon(Icons.Default.FilterList, contentDescription = "Filter")
+                }
+
+                // Notifications
+                IconButton(onClick = { navController.navigate(Screen.Notifications.route) }) {
+                    Icon(Icons.Default.Notifications, contentDescription = "Notifications")
+                }
+
+                // More Options Menu
+                Box {
+                    IconButton(onClick = { showMoreMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    }
+
+                    DropdownMenu(
+                        expanded = showMoreMenu,
+                        onDismissRequest = { showMoreMenu = false }
+                    ) {
+                        // Theme Toggle
+                        DropdownMenuItem(
+                            text = { Text("Toggle Theme") },
+                            onClick = {
+                                showMoreMenu = false
+                                // TODO: Toggle theme via ViewModel
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Brightness4, contentDescription = null)
+                            }
+                        )
+
+                        // Export Data
+                        DropdownMenuItem(
+                            text = { Text("Export Data") },
+                            onClick = {
+                                showMoreMenu = false
+                                // TODO: Implement export functionality
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.CloudDownload, contentDescription = null)
+                            }
+                        )
+
+                        // Backup & Sync
+                        DropdownMenuItem(
+                            text = { Text("Backup & Sync") },
+                            onClick = {
+                                showMoreMenu = false
+                                // TODO: Navigate to backup settings
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Backup, contentDescription = null)
+                            }
+                        )
+
+                        Divider()
+
+                        // Categories Management
+                        DropdownMenuItem(
+                            text = { Text("Manage Categories") },
+                            onClick = {
+                                showMoreMenu = false
+                                navController.navigate(Screen.Categories.route)
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Category, contentDescription = null)
+                            }
+                        )
+
+                        // Goals (if available)
+                        DropdownMenuItem(
+                            text = { Text("Financial Goals") },
+                            onClick = {
+                                showMoreMenu = false
+                                navController.navigate("goals") // Assuming you have goals screen
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.TrendingUp, contentDescription = null)
+                            }
+                        )
+
+                        Divider()
+
+                        // Profile
+                        DropdownMenuItem(
+                            text = { Text("Profile") },
+                            onClick = {
+                                showMoreMenu = false
+                                navController.navigate(Screen.Profile.route)
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.AccountCircle, contentDescription = null)
+                            }
+                        )
+
+                        // Settings
+                        DropdownMenuItem(
+                            text = { Text("Settings") },
+                            onClick = {
+                                showMoreMenu = false
+                                navController.navigate(Screen.Settings.route)
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Settings, contentDescription = null)
+                            }
+                        )
+
+                        // Help & Support
+                        DropdownMenuItem(
+                            text = { Text("Help & Support") },
+                            onClick = {
+                                showMoreMenu = false
+                                // TODO: Navigate to help screen
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Help, contentDescription = null)
+                            }
+                        )
+                    }
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            modifier = modifier
+        )
     }
 }

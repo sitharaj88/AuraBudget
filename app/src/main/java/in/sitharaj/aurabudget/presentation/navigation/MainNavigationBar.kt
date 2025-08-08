@@ -3,11 +3,10 @@ package `in`.sitharaj.aurabudget.presentation.navigation
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -43,7 +42,13 @@ fun MainNavigationBar(
                             contentDescription = screen.title
                         )
                     },
-                    label = { Text(screen.title) },
+                    label = {
+                        Text(
+                            text = screen.title,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
                     selected = currentRoute == screen.route,
                     onClick = {
                         if (currentRoute != screen.route) {

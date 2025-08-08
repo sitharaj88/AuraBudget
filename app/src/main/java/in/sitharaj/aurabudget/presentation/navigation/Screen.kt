@@ -37,6 +37,6 @@ sealed class Screen(
     object About : Screen("about", "About")
 
     companion object {
-        val bottomNavItems = listOf(Dashboard, Transactions, Budget, Analytics, Settings)
+        val bottomNavItems = listOf(Dashboard, Transactions, Budget, Analytics)
     }
 }

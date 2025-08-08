@@ -6,22 +6,28 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,14 +82,12 @@ fun BalanceCard(
                     IncomeExpenseItem(
                         title = "Income",
                         amount = income,
-                        icon = Icons.Default.TrendingUp,
-                        isIncome = true
+                        icon = Icons.AutoMirrored.Filled.TrendingUp
                     )
                     IncomeExpenseItem(
                         title = "Expenses",
                         amount = expenses,
-                        icon = Icons.Default.TrendingDown,
-                        isIncome = false
+                        icon = Icons.AutoMirrored.Filled.TrendingDown
                     )
                 }
             }
@@ -96,7 +100,6 @@ private fun IncomeExpenseItem(
     title: String,
     amount: Double,
     icon: ImageVector,
-    isIncome: Boolean
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -144,6 +147,7 @@ fun QuickActionCard(
 ) {
     Card(
         modifier = modifier
+            .aspectRatio(1f)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
             containerColor = color.copy(alpha = 0.1f)
@@ -152,13 +156,14 @@ fun QuickActionCard(
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(12.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(40.dp)
                     .background(color.copy(alpha = 0.2f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -166,16 +171,19 @@ fun QuickActionCard(
                     imageVector = icon,
                     contentDescription = title,
                     tint = color,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = title,
-                fontSize = 12.sp,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 12.sp
             )
         }
     }
@@ -189,26 +197,47 @@ fun QuickActionsRow(
     onBudget: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
+    val actions = listOf(
+        QuickActionData("Add Income", Icons.Default.Add, Color.Green, onAddIncome),
+        QuickActionData("Add Expense", Icons.Default.Remove, Color.Red, onAddExpense),
+        QuickActionData("Transfer", Icons.Default.SwapHoriz, Color.Blue, onTransfer),
+        QuickActionData("Budget", Icons.Default.AccountBalance, Color(0xFFFF9800), onBudget)
+    )
+
+    Column(
+        modifier = modifier.padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(
-            listOf(
-                QuickActionData("Add Income", Icons.Default.Add, Color.Green, onAddIncome),
-                QuickActionData("Add Expense", Icons.Default.Remove, Color.Red, onAddExpense),
-                QuickActionData("Transfer", Icons.Default.SwapHoriz, Color.Blue, onTransfer),
-                QuickActionData("Budget", Icons.Default.AccountBalance, Color(0xFFFF9800), onBudget)
-            )
-        ) { actionData ->
-            QuickActionCard(
-                title = actionData.title,
-                icon = actionData.icon,
-                color = actionData.color,
-                onClick = actionData.action,
-                modifier = Modifier.width(80.dp)
-            )
+        // First row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            actions.take(2).forEach { actionData ->
+                QuickActionCard(
+                    title = actionData.title,
+                    icon = actionData.icon,
+                    color = actionData.color,
+                    onClick = actionData.action,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        // Second row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            actions.drop(2).forEach { actionData ->
+                QuickActionCard(
+                    title = actionData.title,
+                    icon = actionData.icon,
+                    color = actionData.color,
+                    onClick = actionData.action,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
