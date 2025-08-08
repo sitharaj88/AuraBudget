@@ -14,7 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import `in`.sitharaj.aurabudget.presentation.screen.EnhancedDashboardScreen
 import `in`.sitharaj.aurabudget.presentation.screen.EnhancedExpenseScreen
-import `in`.sitharaj.aurabudget.ui.screens.SettingsScreen
+import `in`.sitharaj.aurabudget.presentation.screen.settings.SettingsScreen
 import `in`.sitharaj.aurabudget.ui.screens.SplashScreen
 import `in`.sitharaj.aurabudget.ui.theme.AuraBudgetTheme
 import `in`.sitharaj.aurabudget.presentation.viewmodel.ThemeViewModel

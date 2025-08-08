@@ -16,5 +16,7 @@ data class CategoryEntity(
     val color: String?,
     val type: String = "EXPENSE", // Store enum as string
     val isDefault: Boolean = false,
+    val isActive: Boolean = true,
+    val usageCount: Int = 0,
     val monthlyBudget: Double? = null
 )

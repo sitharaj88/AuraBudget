@@ -14,9 +14,11 @@ object CategoryMapper {
             id = entity.id,
             name = entity.name,
             icon = entity.icon,
-            color = entity.color,
+            color = entity.color?.toLongOrNull(),
             type = CategoryDomainEntity.CategoryType.valueOf(entity.type),
             isDefault = entity.isDefault,
+            isActive = entity.isActive ?: true,
+            usageCount = entity.usageCount ?: 0,
             monthlyBudget = entity.monthlyBudget
         )
     }
@@ -26,9 +28,11 @@ object CategoryMapper {
             id = domainEntity.id,
             name = domainEntity.name,
             icon = domainEntity.icon,
-            color = domainEntity.color,
+            color = domainEntity.color?.toString(),
             type = domainEntity.type.name,
             isDefault = domainEntity.isDefault,
+            isActive = domainEntity.isActive,
+            usageCount = domainEntity.usageCount,
             monthlyBudget = domainEntity.monthlyBudget
         )
     }

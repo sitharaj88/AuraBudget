@@ -30,9 +30,9 @@ class CategoryRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertCategory(category: CategoryEntity): Long {
+    override suspend fun insertCategory(category: CategoryEntity) {
         val dataEntity = CategoryMapper.mapToData(category)
-        return categoryDao.insertCategory(dataEntity)
+        categoryDao.insertCategory(dataEntity)
     }
 
     override suspend fun updateCategory(category: CategoryEntity) {
@@ -40,13 +40,23 @@ class CategoryRepositoryImpl @Inject constructor(
         categoryDao.updateCategory(dataEntity)
     }
 
-    override suspend fun deleteCategory(category: CategoryEntity) {
-        val dataEntity = CategoryMapper.mapToData(category)
-        categoryDao.deleteCategory(dataEntity)
+    override suspend fun deleteCategory(categoryId: Long) {
+        // Get the category first, then delete it
+        val category = categoryDao.getCategoryById(categoryId)
+        category?.let { categoryDao.deleteCategory(it) }
     }
 
-    override suspend fun getCategoryById(id: Long): CategoryEntity? {
-        return categoryDao.getCategoryById(id)?.let { entity ->
+    override suspend fun toggleCategoryActive(categoryId: Long) {
+        // Get the category, toggle isActive, then update
+        val category = categoryDao.getCategoryById(categoryId)
+        category?.let {
+            val updatedCategory = it.copy(isActive = !it.isActive)
+            categoryDao.updateCategory(updatedCategory)
+        }
+    }
+
+    override suspend fun getCategoryById(categoryId: Long): CategoryEntity? {
+        return categoryDao.getCategoryById(categoryId)?.let { entity ->
             CategoryMapper.mapToDomain(entity)
         }
     }
@@ -61,14 +71,14 @@ class CategoryRepositoryImpl @Inject constructor(
         val count = categoryDao.getCategoryCount()
         if (count == 0) {
             val defaultCategories = listOf(
-                CategoryEntity(name = "Food & Dining", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "food_icon", color = "red"),
-                CategoryEntity(name = "Transportation", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "transport_icon", color = "blue"),
-                CategoryEntity(name = "Shopping", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "shopping_icon", color = "green"),
-                CategoryEntity(name = "Entertainment", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "entertainment_icon", color = "yellow"),
-                CategoryEntity(name = "Bills & Utilities", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "bills_icon", color = "purple"),
-                CategoryEntity(name = "Healthcare", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "healthcare_icon", color = "orange"),
-                CategoryEntity(name = "Travel", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "travel_icon", color = "cyan"),
-                CategoryEntity(name = "Other", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "other_icon", color = "magenta")
+                CategoryEntity(name = "Food & Dining", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "food_icon", color = 0xFF6200EE),
+                CategoryEntity(name = "Transportation", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "transport_icon", color = 0xFF03DAC6),
+                CategoryEntity(name = "Shopping", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "shopping_icon", color = 0xFFFF6B6B),
+                CategoryEntity(name = "Entertainment", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "entertainment_icon", color = 0xFF4ECDC4),
+                CategoryEntity(name = "Bills & Utilities", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "bills_icon", color = 0xFF45B7D1),
+                CategoryEntity(name = "Healthcare", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "healthcare_icon", color = 0xFF96CEB4),
+                CategoryEntity(name = "Travel", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "travel_icon", color = 0xFFFD79A8),
+                CategoryEntity(name = "Education", type = CategoryEntity.CategoryType.EXPENSE, isDefault = true, icon = "education_icon", color = 0xFFE84393)
             )
 
             defaultCategories.forEach { category ->

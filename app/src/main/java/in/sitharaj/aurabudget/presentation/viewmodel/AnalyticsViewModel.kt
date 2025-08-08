@@ -35,16 +35,16 @@ class AnalyticsViewModel @Inject constructor(
                 getFinancialGoals(),
                 getAccountsData()
             ) { expenses, budgets, goals, accounts ->
-
+                
                 val currentMonthExpenses = expenses.filter { expense ->
                     isCurrentMonth(expense.date)
                 }
-
+                
                 val totalExpenses = currentMonthExpenses.sumOf { it.amount }
                 val totalIncome = calculateTotalIncome(accounts)
                 val netSavings = totalIncome - totalExpenses
                 val savingsRate = if (totalIncome > 0) (netSavings / totalIncome) * 100 else 0.0
-
+                
                 // Group expenses by category
                 val expensesByCategory = currentMonthExpenses
                     .groupBy { it.categoryId }
@@ -52,28 +52,28 @@ class AnalyticsViewModel @Inject constructor(
                         getCategoryName(categoryId) to expenses.sumOf { it.amount }
                     }
                     .sortedByDescending { it.second }
-
+                
                 // Calculate monthly trend (last 6 months)
                 val monthlyTrend = calculateMonthlyTrend(expenses)
-
+                
                 // Calculate budget progress
                 val budgetProgress = budgets.map { budget ->
                     val spent = currentMonthExpenses
                         .filter { it.categoryId == budget.categoryId }
                         .sumOf { it.amount }
-
+                    
                     BudgetProgress(
                         name = getCategoryName(budget.categoryId ?: 0L),
                         spent = spent,
                         amount = budget.amount
                     )
                 }
-
+                
                 // Generate AI insights
                 val insights = generateFinancialInsights(
                     totalExpenses, totalIncome, expensesByCategory, budgetProgress
                 )
-
+                
                 AnalyticsUiState(
                     totalIncome = totalIncome,
                     totalExpenses = totalExpenses,
@@ -86,7 +86,7 @@ class AnalyticsViewModel @Inject constructor(
                     insights = insights,
                     isLoading = false
                 )
-
+                
             }.collect { newState ->
                 _uiState.value = newState
             }
@@ -124,7 +124,7 @@ class AnalyticsViewModel @Inject constructor(
         val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun")
         return months.mapIndexed { index, month ->
             // Calculate expenses for each month (simplified)
-            val monthlyExpenses = expenses.filter {
+            val monthlyExpenses = expenses.filter { 
                 // Filter by month logic here
                 true
             }.sumOf { it.amount }
@@ -179,7 +179,7 @@ class AnalyticsViewModel @Inject constructor(
         budgetProgress: List<BudgetProgress>
     ): List<String> {
         val insights = mutableListOf<String>()
-
+        
         // Savings rate insight
         val savingsRate = if (totalIncome > 0) (totalIncome - totalExpenses) / totalIncome * 100 else 0.0
         when {
@@ -187,14 +187,14 @@ class AnalyticsViewModel @Inject constructor(
             savingsRate >= 10 -> insights.add("Good job! You're saving ${savingsRate.toInt()}% of your income. Consider increasing to 20% for better financial health.")
             else -> insights.add("Your savings rate is ${savingsRate.toInt()}%. Try to reduce expenses or increase income to save more.")
         }
-
+        
         // Top spending category insight
         if (expensesByCategory.isNotEmpty()) {
             val topCategory = expensesByCategory.first()
             val percentage = (topCategory.second / totalExpenses * 100).toInt()
             insights.add("Your largest expense category is ${topCategory.first} at ${percentage}% of total spending.")
         }
-
+        
         // Budget compliance insight
         val overBudgetCount = budgetProgress.count { it.spent > it.amount }
         if (overBudgetCount > 0) {
@@ -202,10 +202,10 @@ class AnalyticsViewModel @Inject constructor(
         } else {
             insights.add("Great! You're staying within budget across all categories this month.")
         }
-
+        
         // Spending trend insight
         insights.add("Based on your spending patterns, consider setting up automatic savings to reach your financial goals faster.")
-
+        
         return insights
     }
 

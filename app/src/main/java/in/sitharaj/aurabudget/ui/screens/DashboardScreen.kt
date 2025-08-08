@@ -27,7 +27,7 @@ fun DashboardScreen(
     budgetViewModel: BudgetViewModel = hiltViewModel()
 ) {
     val expenses by expenseViewModel.expenses.collectAsState()
-    val budgets by budgetViewModel.budgets.collectAsState()
+    val budgetUiState by budgetViewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -99,14 +99,20 @@ fun DashboardScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Box(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(32.dp),
-                            contentAlignment = Alignment.Center
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "No expenses yet. Tap + to add your first expense!",
+                                text = "No expenses yet",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "Tap the + button to add your first expense",
+                                fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                             )
                         }
@@ -117,29 +123,26 @@ fun DashboardScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            modifier = Modifier.padding(16.dp)
                         ) {
-                            Column {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Text(
                                     text = expense.description ?: "No description",
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
-                                    text = "Category ID: ${expense.categoryId}",
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    text = "$${expense.amount}",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.error
                                 )
                             }
-                            Text(
-                                text = expense.getFormattedAmount(),
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.error
-                            )
                         }
                     }
                 }

@@ -32,11 +32,11 @@ fun AnalyticsScreen(
     viewModel: AnalyticsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
+    
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
+                title = { 
                     Text(
                         "Analytics",
                         fontWeight = FontWeight.Bold
@@ -63,7 +63,7 @@ fun AnalyticsScreen(
             item {
                 Spacer(modifier = Modifier.height(8.dp))
             }
-
+            
             // Financial Overview Cards
             item {
                 Text(
@@ -72,9 +72,9 @@ fun AnalyticsScreen(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-
+                
                 Spacer(modifier = Modifier.height(12.dp))
-
+                
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -117,7 +117,7 @@ fun AnalyticsScreen(
                     }
                 }
             }
-
+            
             // Spending by Category Chart
             item {
                 ExpensePieChart(
@@ -134,14 +134,14 @@ fun AnalyticsScreen(
                     )
                 )
             }
-
+            
             // Monthly Trend Chart
             item {
                 SpendingTrendChart(
                     data = uiState.monthlyTrend
                 )
             }
-
+            
             // Budget Progress Section
             item {
                 Text(
@@ -151,7 +151,7 @@ fun AnalyticsScreen(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-
+            
             items(uiState.budgetProgress) { budget ->
                 BudgetProgressChart(
                     budgetName = budget.name,
@@ -159,7 +159,7 @@ fun AnalyticsScreen(
                     budget = budget.amount
                 )
             }
-
+            
             // Goals Section
             item {
                 Text(
@@ -169,19 +169,19 @@ fun AnalyticsScreen(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-
+            
             items(uiState.financialGoals) { goal ->
                 GoalProgressCard(
                     goal = goal,
                     onGoalClick = { /* TODO: Navigate to goal details */ }
                 )
             }
-
+            
             // Insights & Recommendations
             item {
                 InsightsCard(insights = uiState.insights)
             }
-
+            
             item {
                 Spacer(modifier = Modifier.height(100.dp))
             }
@@ -220,7 +220,7 @@ fun FinancialMetricCard(
                     tint = color,
                     modifier = Modifier.size(24.dp)
                 )
-
+                
                 Text(
                     text = change,
                     fontSize = 12.sp,
@@ -228,15 +228,15 @@ fun FinancialMetricCard(
                     fontWeight = FontWeight.Medium
                 )
             }
-
+            
             Spacer(modifier = Modifier.height(12.dp))
-
+            
             Text(
                 text = title,
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
-
+            
             Text(
                 text = if (isPercentage) "${amount.toInt()}%" else String.format(Locale.US, "$%.2f", amount),
                 fontSize = 20.sp,
@@ -274,14 +274,14 @@ fun GoalProgressCard(
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-
+                    
                     Text(
                         text = "${String.format(Locale.US, "$%.0f", goal.currentAmount)} of ${String.format(Locale.US, "$%.0f", goal.targetAmount)}",
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
-
+                
                 Text(
                     text = "${(goal.getProgress() * 100).toInt()}%",
                     fontSize = 18.sp,
@@ -289,9 +289,9 @@ fun GoalProgressCard(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-
+            
             Spacer(modifier = Modifier.height(12.dp))
-
+            
             LinearProgressIndicator(
                 progress = { goal.getProgress() },
                 modifier = Modifier
@@ -299,9 +299,9 @@ fun GoalProgressCard(
                     .height(8.dp),
                 color = MaterialTheme.colorScheme.primary
             )
-
+            
             Spacer(modifier = Modifier.height(8.dp))
-
+            
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -311,7 +311,7 @@ fun GoalProgressCard(
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
-
+                
                 Text(
                     text = if (goal.isOnTrack()) "✅ On track" else "⚠️ Behind",
                     fontSize = 12.sp,
@@ -346,9 +346,9 @@ fun InsightsCard(
                     tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.size(24.dp)
                 )
-
+                
                 Spacer(modifier = Modifier.width(8.dp))
-
+                
                 Text(
                     text = "Smart Insights",
                     fontSize = 18.sp,
@@ -356,9 +356,9 @@ fun InsightsCard(
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
-
+            
             Spacer(modifier = Modifier.height(12.dp))
-
+            
             insights.forEach { insight ->
                 Row(
                     modifier = Modifier.padding(vertical = 4.dp)
@@ -367,9 +367,9 @@ fun InsightsCard(
                         text = "💡",
                         fontSize = 16.sp
                     )
-
+                    
                     Spacer(modifier = Modifier.width(8.dp))
-
+                    
                     Text(
                         text = insight,
                         fontSize = 14.sp,
