@@ -16,11 +16,13 @@
 
     <!-- Splash Theme for optimal startup experience -->
     <style name="Theme.AuraBudget.Splash" parent="Theme.AuraBudget">
-        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">#FF667EEA</item>
+        <item name="android:navigationBarColor">#FF6B73FF</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 
 </resources>
