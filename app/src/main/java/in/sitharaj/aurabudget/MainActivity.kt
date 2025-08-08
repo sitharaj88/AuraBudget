@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -14,13 +17,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import `in`.sitharaj.aurabudget.presentation.navigation.MainNavigationBar
 import `in`.sitharaj.aurabudget.presentation.navigation.Screen
 import `in`.sitharaj.aurabudget.presentation.screen.*
-import `in`.sitharaj.aurabudget.ui.screens.SplashScreen
 import `in`.sitharaj.aurabudget.ui.theme.AuraBudgetTheme
 import `in`.sitharaj.aurabudget.presentation.viewmodel.ThemeViewModel
 
@@ -42,16 +45,76 @@ fun AuraBudgetScreen() {
 
     AuraBudgetTheme(darkTheme = isDarkTheme) {
         val navController = rememberNavController()
+        val currentDestination by navController.currentBackStackEntryAsState()
+        val currentRoute = currentDestination?.destination?.route
+
+        // Hide bottom bar on splash screen
+        val shouldShowBottomBar = currentRoute != Screen.Splash.route
 
         Scaffold(
             bottomBar = {
-                MainNavigationBar(navController = navController)
+                AnimatedVisibility(
+                    visible = shouldShowBottomBar,
+                    enter = slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = FastOutSlowInEasing
+                        )
+                    ) + fadeIn(
+                        animationSpec = tween(
+                            durationMillis = 400,
+                            delayMillis = 200
+                        )
+                    ),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = tween(300)
+                    ) + fadeOut(tween(200))
+                ) {
+                    MainNavigationBar(navController = navController)
+                }
             }
         ) { paddingValues ->
             NavHost(
                 navController = navController,
                 startDestination = Screen.Splash.route,
-                modifier = Modifier.padding(paddingValues)
+                modifier = if (shouldShowBottomBar) Modifier.padding(paddingValues) else Modifier,
+                enterTransition = {
+                    if (initialState.destination.route == Screen.Splash.route) {
+                        // Smooth fade-in when coming from splash
+                        fadeIn(
+                            animationSpec = tween(
+                                durationMillis = 800,
+                                easing = FastOutSlowInEasing
+                            )
+                        ) + slideInVertically(
+                            initialOffsetY = { it / 4 },
+                            animationSpec = tween(
+                                durationMillis = 600,
+                                easing = FastOutSlowInEasing
+                            )
+                        )
+                    } else {
+                        // Normal transitions between other screens
+                        fadeIn(tween(300)) + slideInHorizontally(
+                            initialOffsetX = { it / 3 },
+                            animationSpec = tween(300)
+                        )
+                    }
+                },
+                exitTransition = {
+                    if (targetState.destination.route == Screen.Splash.route) {
+                        // Fade out when going to splash (shouldn't happen normally)
+                        fadeOut(tween(300))
+                    } else {
+                        // Normal transitions between other screens
+                        fadeOut(tween(200)) + slideOutHorizontally(
+                            targetOffsetX = { -it / 3 },
+                            animationSpec = tween(200)
+                        )
+                    }
+                }
             ) {
                 // Splash and Onboarding
                 composable(Screen.Splash.route) {

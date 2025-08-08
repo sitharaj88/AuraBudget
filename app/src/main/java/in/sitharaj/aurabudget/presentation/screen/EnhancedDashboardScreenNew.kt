@@ -246,11 +246,11 @@ fun EnhancedTopAppBar(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    placeholder = {
+                    placeholder = { 
                         Text(
                             "Search transactions...",
                             style = MaterialTheme.typography.bodyMedium
-                        )
+                        ) 
                     },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),

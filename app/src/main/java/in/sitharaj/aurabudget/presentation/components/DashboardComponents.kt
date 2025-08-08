@@ -27,6 +27,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import `in`.sitharaj.aurabudget.ui.theme.QuickActionBudget
+import `in`.sitharaj.aurabudget.ui.theme.QuickActionExpense
+import `in`.sitharaj.aurabudget.ui.theme.QuickActionIncome
+import `in`.sitharaj.aurabudget.ui.theme.QuickActionTransfer
 import java.util.*
 
 val IncomeGreen = Color(0xFF4CAF50)
@@ -218,23 +222,23 @@ fun QuickActionsRow(
     modifier: Modifier = Modifier
 ) {
     val actions = listOf(
-        QuickActionData("Add Income", Icons.Default.Add, Color.Green, onAddIncome),
-        QuickActionData("Add Expense", Icons.Default.Remove, Color.Red, onAddExpense),
-        QuickActionData("Transfer", Icons.Default.SwapHoriz, Color.Blue, onTransfer),
-        QuickActionData("Budget", Icons.Default.AccountBalance, Color(0xFFFF9800), onBudget)
+        QuickActionData("Add Income", Icons.Default.Add, QuickActionIncome, onAddIncome),
+        QuickActionData("Add Expense", Icons.Default.Remove, QuickActionExpense, onAddExpense),
+        QuickActionData("Transfer", Icons.Default.SwapHoriz, QuickActionTransfer, onTransfer),
+        QuickActionData("Budget", Icons.Default.AccountBalance, QuickActionBudget, onBudget)
     )
 
     Column(
         modifier = modifier.padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // First row
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             actions.take(2).forEach { actionData ->
-                QuickActionCard(
+                EnhancedQuickActionCard(
                     title = actionData.title,
                     icon = actionData.icon,
                     color = actionData.color,
@@ -247,15 +251,109 @@ fun QuickActionsRow(
         // Second row
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             actions.drop(2).forEach { actionData ->
-                QuickActionCard(
+                EnhancedQuickActionCard(
                     title = actionData.title,
                     icon = actionData.icon,
                     color = actionData.color,
                     onClick = actionData.action,
                     modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun EnhancedQuickActionCard(
+    title: String,
+    icon: ImageVector,
+    color: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .aspectRatio(1f)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 8.dp
+        ),
+        shape = MaterialTheme.shapes.extraLarge
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Beautiful gradient background
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                color.copy(alpha = 0.1f),
+                                color.copy(alpha = 0.05f),
+                                Color.Transparent
+                            ),
+                            radius = 120f
+                        )
+                    )
+            )
+            
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                // Gorgeous icon container with gradient
+                Card(
+                    modifier = Modifier.size(56.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Transparent
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.linearGradient(
+                                    colors = listOf(
+                                        color,
+                                        color.copy(alpha = 0.8f)
+                                    )
+                                ),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = title,
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

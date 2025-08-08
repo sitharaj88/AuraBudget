@@ -236,7 +236,7 @@ fun CategorySpendingCard(
                     .fillMaxWidth()
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
-                color = if (progress > 0.8f) Color.Red else color,
+                color = if (progress.toFloat() > 0.8f) Color.Red else color,
                 trackColor = color.copy(alpha = 0.2f)
             )
         }

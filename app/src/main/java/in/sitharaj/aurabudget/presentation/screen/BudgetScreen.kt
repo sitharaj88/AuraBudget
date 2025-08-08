@@ -360,7 +360,7 @@ fun BudgetCategoryCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             LinearProgressIndicator(
-                progress = progress.toFloat(),
+                progress = { progress.toFloat() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(6.dp)
