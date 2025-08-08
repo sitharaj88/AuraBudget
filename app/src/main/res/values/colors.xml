@@ -1,10 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Aura Brand Colors -->
+    <color name="aura_primary">#667EEA</color>
+    <color name="aura_primary_variant">#764BA2</color>
+    <color name="aura_secondary">#6B73FF</color>
+    <color name="aura_accent">#4F46E5</color>
+
+    <!-- Budget Colors -->
+    <color name="budget_green">#10B981</color>
+    <color name="budget_amber">#F59E0B</color>
+    <color name="budget_emerald">#059669</color>
+
+    <!-- Background Colors -->
+    <color name="splash_gradient_start">#667EEA</color>
+    <color name="splash_gradient_center">#764BA2</color>
+    <color name="splash_gradient_end">#6B73FF</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary_white">#FFFFFF</color>
+    <color name="text_secondary_white">#E5E7EB</color>
+    <color name="text_accent_blue">#4F46E5</color>
+
+    <!-- Surface Colors -->
+    <color name="surface_glass">#1AFFFFFF</color>
+    <color name="surface_glass_strong">#40FFFFFF</color>
+
+    <!-- Status Bar -->
+    <color name="status_bar_color">#4C1D95</color>
+    <color name="navigation_bar_color">#4C1D95</color>
 </resources>
+

@@ -3,11 +3,10 @@ package `in`.sitharaj.aurabudget.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import `in`.sitharaj.aurabudget.domain.model.BudgetEntity
 import `in`.sitharaj.aurabudget.domain.repository.BudgetRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -19,22 +18,60 @@ class BudgetViewModel @Inject constructor(
     private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
-    val budgets = budgetRepository.getAllBudgets()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    private val _uiState = MutableStateFlow(BudgetUiState())
+    val uiState: StateFlow<BudgetUiState> = _uiState.asStateFlow()
+
+    init {
+        loadBudgets()
+    }
+
+    private fun loadBudgets() {
+        viewModelScope.launch {
+            budgetRepository.getAllBudgets().collect { budgets ->
+                _uiState.value = _uiState.value.copy(
+                    budgets = budgets,
+                    isLoading = false
+                )
+            }
+        }
+    }
 
     fun addBudget(budget: BudgetEntity) {
         viewModelScope.launch {
-            budgetRepository.insertBudget(budget)
+            try {
+                budgetRepository.insertBudget(budget)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message)
+            }
         }
     }
 
-    fun deleteBudget(budget: BudgetEntity) {
+    fun deleteBudget(budgetId: Long) {
         viewModelScope.launch {
-            budgetRepository.deleteBudget(budget)
+            try {
+                val budget = budgetRepository.getBudgetById(budgetId)
+                budget?.let {
+                    budgetRepository.deleteBudget(it)
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message)
+            }
+        }
+    }
+
+    fun updateBudget(budget: BudgetEntity) {
+        viewModelScope.launch {
+            try {
+                budgetRepository.updateBudget(budget)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message)
+            }
         }
     }
 }
+
+data class BudgetUiState(
+    val budgets: List<BudgetEntity> = emptyList(),
+    val isLoading: Boolean = true,
+    val error: String? = null
+)

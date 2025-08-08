@@ -1,96 +1,378 @@
 package `in`.sitharaj.aurabudget.presentation.components
 
+import androidx.compose.animation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import `in`.sitharaj.aurabudget.ui.theme.QuickActionBudget
+import `in`.sitharaj.aurabudget.ui.theme.QuickActionExpense
+import `in`.sitharaj.aurabudget.ui.theme.QuickActionIncome
+import `in`.sitharaj.aurabudget.ui.theme.QuickActionTransfer
+import java.util.*
 
-/**
- * Beautiful financial summary card for dashboard
- * Following Single Responsibility Principle
- */
+val IncomeGreen = Color(0xFF4CAF50)
+val ExpenseRed = Color(0xFFF44336)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FinancialSummaryCard(
-    title: String,
-    amount: Double,
-    subtitle: String? = null,
-    trend: String? = null,
-    isPositive: Boolean = true,
-    backgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    modifier: Modifier = Modifier
+fun BalanceCard(
+    balance: Double,
+    income: Double,
+    expenses: Double,
+    modifier: Modifier = Modifier,
+    onCardClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
+            .clickable { onCardClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp,
+            pressedElevation = 8.dp
+        ),
+        shape = MaterialTheme.shapes.large
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primaryContainer,
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
+                        ),
+                        start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                        end = androidx.compose.ui.geometry.Offset(1000f, 1000f)
+                    )
+                )
+                .padding(24.dp)
         ) {
-            Text(
-                text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = String.format("$%.2f", amount),
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-
-            if (subtitle != null || trend != null) {
+            Column {
+                Text(
+                    text = "Current Balance",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-
+                Text(
+                    text = "₹${String.format("%.2f", balance)}",
+                    style = MaterialTheme.typography.displayMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Spacer(modifier = Modifier.height(24.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    if (subtitle != null) {
-                        Text(
-                            text = subtitle,
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                        )
-                    }
-
-                    if (trend != null) {
-                        Text(
-                            text = trend,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (isPositive) Color(0xFF4CAF50) else Color(0xFFF44336)
-                        )
-                    }
+                    IncomeExpenseItem(
+                        title = "Income",
+                        amount = income,
+                        icon = Icons.AutoMirrored.Filled.TrendingUp,
+                        color = IncomeGreen
+                    )
+                    IncomeExpenseItem(
+                        title = "Expenses",
+                        amount = expenses,
+                        icon = Icons.AutoMirrored.Filled.TrendingDown,
+                        color = ExpenseRed
+                    )
                 }
             }
         }
     }
 }
 
-/**
- * Category spending breakdown component
- */
 @Composable
-fun CategorySpendingItem(
-    categoryName: String,
+private fun IncomeExpenseItem(
+    title: String,
     amount: Double,
-    percentage: Float,
-    color: Color = MaterialTheme.colorScheme.primary,
+    icon: ImageVector,
+    color: Color
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .background(
+                    color.copy(alpha = 0.2f),
+                    CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = color,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                fontSize = 12.sp
+            )
+            Text(
+                text = "₹${String.format("%.0f", amount)}",
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
+
+@Composable
+fun QuickActionCard(
+    title: String,
+    icon: ImageVector,
+    color: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .aspectRatio(1f)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            pressedElevation = 6.dp
+        ),
+        shape = MaterialTheme.shapes.large
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Card(
+                modifier = Modifier.size(48.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = color.copy(alpha = 0.12f)
+                ),
+                shape = CircleShape,
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = title,
+                        tint = color,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+fun QuickActionsRow(
+    onAddIncome: () -> Unit,
+    onAddExpense: () -> Unit,
+    onTransfer: () -> Unit,
+    onBudget: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val actions = listOf(
+        QuickActionData("Add Income", Icons.Default.Add, QuickActionIncome, onAddIncome),
+        QuickActionData("Add Expense", Icons.Default.Remove, QuickActionExpense, onAddExpense),
+        QuickActionData("Transfer", Icons.Default.SwapHoriz, QuickActionTransfer, onTransfer),
+        QuickActionData("Budget", Icons.Default.AccountBalance, QuickActionBudget, onBudget)
+    )
+
+    Column(
+        modifier = modifier.padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // First row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            actions.take(2).forEach { actionData ->
+                EnhancedQuickActionCard(
+                    title = actionData.title,
+                    icon = actionData.icon,
+                    color = actionData.color,
+                    onClick = actionData.action,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        // Second row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            actions.drop(2).forEach { actionData ->
+                EnhancedQuickActionCard(
+                    title = actionData.title,
+                    icon = actionData.icon,
+                    color = actionData.color,
+                    onClick = actionData.action,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun EnhancedQuickActionCard(
+    title: String,
+    icon: ImageVector,
+    color: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .aspectRatio(1f)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 8.dp
+        ),
+        shape = MaterialTheme.shapes.extraLarge
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Beautiful gradient background
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                color.copy(alpha = 0.1f),
+                                color.copy(alpha = 0.05f),
+                                Color.Transparent
+                            ),
+                            radius = 120f
+                        )
+                    )
+            )
+            
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                // Gorgeous icon container with gradient
+                Card(
+                    modifier = Modifier.size(56.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Transparent
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.linearGradient(
+                                    colors = listOf(
+                                        color,
+                                        color.copy(alpha = 0.8f)
+                                    )
+                                ),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = title,
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+data class QuickActionData(
+    val title: String,
+    val icon: ImageVector,
+    val color: Color,
+    val action: () -> Unit
+)
+
+@Composable
+fun SectionHeader(
+    title: String,
+    subtitle: String? = null,
+    actionText: String? = null,
+    onActionClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -98,44 +380,29 @@ fun CategorySpendingItem(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .then(Modifier.fillMaxSize())
-            ) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = color),
-                    modifier = Modifier.fillMaxSize()
-                ) {}
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column {
+        Column {
+            Text(
+                text = title,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            if (subtitle != null) {
                 Text(
-                    text = categoryName,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "${String.format("%.1f", percentage)}%",
+                    text = subtitle,
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
-
-        Text(
-            text = String.format("$%.2f", amount),
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        if (actionText != null) {
+            TextButton(onClick = onActionClick) {
+                Text(
+                    text = actionText,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
     }
 }

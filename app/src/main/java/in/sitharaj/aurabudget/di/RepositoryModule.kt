@@ -8,10 +8,12 @@ import `in`.sitharaj.aurabudget.data.repository.ExpenseRepositoryImpl
 import `in`.sitharaj.aurabudget.data.repository.BudgetRepositoryImpl
 import `in`.sitharaj.aurabudget.data.repository.CategoryRepositoryImpl
 import `in`.sitharaj.aurabudget.data.repository.PreferencesRepositoryImpl
+import `in`.sitharaj.aurabudget.data.repository.GoalsRepositoryImpl
 import `in`.sitharaj.aurabudget.domain.repository.ExpenseRepository
 import `in`.sitharaj.aurabudget.domain.repository.BudgetRepository
 import `in`.sitharaj.aurabudget.domain.repository.CategoryRepository
 import `in`.sitharaj.aurabudget.domain.repository.PreferencesRepository
+import `in`.sitharaj.aurabudget.domain.repository.GoalsRepository
 import javax.inject.Singleton
 
 /**
@@ -45,4 +47,10 @@ abstract class RepositoryModule {
     abstract fun bindPreferencesRepository(
         preferencesRepositoryImpl: PreferencesRepositoryImpl
     ): PreferencesRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindGoalsRepository(
+        goalsRepositoryImpl: GoalsRepositoryImpl
+    ): GoalsRepository
 }

@@ -8,9 +8,11 @@ data class CategoryEntity(
     val id: Long = 0,
     val name: String,
     val icon: String?,
-    val color: String?,
+    val color: Long?,
     val type: CategoryType = CategoryType.EXPENSE,
     val isDefault: Boolean = false,
+    val isActive: Boolean = true,
+    val usageCount: Int = 0,
     val monthlyBudget: Double? = null
 ) {
     enum class CategoryType {
