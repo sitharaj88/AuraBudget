@@ -1,9 +1,12 @@
 package `in`.sitharaj.aurabudget.presentation.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -11,371 +14,403 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import `in`.sitharaj.aurabudget.presentation.components.charts.*
-import `in`.sitharaj.aurabudget.presentation.components.*
-import `in`.sitharaj.aurabudget.presentation.viewmodel.AnalyticsViewModel
-import `in`.sitharaj.aurabudget.domain.model.FinancialGoal
-import java.util.Locale
+import `in`.sitharaj.aurabudget.presentation.components.SectionHeader
 
-/**
- * Advanced Analytics Dashboard with comprehensive financial insights
- */
+data class AnalyticsCard(
+    val title: String,
+    val value: String,
+    val change: String,
+    val isPositive: Boolean,
+    val icon: ImageVector,
+    val color: Color
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsScreen(
     navController: NavController,
-    viewModel: AnalyticsViewModel = hiltViewModel()
+    modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        "Analytics",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                actions = {
-                    IconButton(onClick = { viewModel.exportData() }) {
-                        Icon(Icons.Default.Download, contentDescription = "Export")
-                    }
-                    IconButton(onClick = { /* TODO: Settings */ }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
-                    }
+    var selectedPeriod by remember { mutableStateOf("This Month") }
+
+    val analyticsCards = listOf(
+        AnalyticsCard(
+            title = "Total Income",
+            value = "₹75,000",
+            change = "+12%",
+            isPositive = true,
+            icon = Icons.Default.TrendingUp,
+            color = Color.Green
+        ),
+        AnalyticsCard(
+            title = "Total Expenses",
+            value = "₹32,500",
+            change = "-8%",
+            isPositive = true,
+            icon = Icons.Default.TrendingDown,
+            color = Color.Red
+        ),
+        AnalyticsCard(
+            title = "Savings Rate",
+            value = "57%",
+            change = "+5%",
+            isPositive = true,
+            icon = Icons.Default.Savings,
+            color = Color.Blue
+        ),
+        AnalyticsCard(
+            title = "Budget Adherence",
+            value = "85%",
+            change = "+3%",
+            isPositive = true,
+            icon = Icons.Default.CheckCircle,
+            color = Color.Red
+        )
+    )
+
+    val categoryBreakdown = listOf(
+        Triple("Food & Dining", 26.1, Color(0xFF4CAF50)),
+        Triple("Transportation", 12.9, Color(0xFF2196F3)),
+        Triple("Shopping", 20.9, Color(0xFFFF9800)),
+        Triple("Entertainment", 6.5, Color(0xFF9C27B0)),
+        Triple("Utilities", 16.9, Color(0xFFFF5722)),
+        Triple("Others", 16.7, Color(0xFF607D8B))
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+    ) {
+        // Top App Bar
+        TopAppBar(
+            title = { Text("Analytics") },
+            actions = {
+                IconButton(onClick = { /* Export data */ }) {
+                    Icon(Icons.Default.FileDownload, contentDescription = "Export")
                 }
-            )
-        }
-    ) { paddingValues ->
+                IconButton(onClick = { /* Share insights */ }) {
+                    Icon(Icons.Default.Share, contentDescription = "Share")
+                }
+            }
+        )
+
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            // Period Selection
             item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            
-            // Financial Overview Cards
-            item {
-                Text(
-                    text = "Financial Overview",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    item {
-                        FinancialMetricCard(
-                            title = "Total Income",
-                            amount = uiState.totalIncome,
-                            icon = Icons.Default.TrendingUp,
-                            color = Color(0xFF4CAF50),
-                            change = "+12.5%"
-                        )
-                    }
-                    item {
-                        FinancialMetricCard(
-                            title = "Total Expenses",
-                            amount = uiState.totalExpenses,
-                            icon = Icons.Default.TrendingDown,
-                            color = Color(0xFFF44336),
-                            change = "+5.2%"
-                        )
-                    }
-                    item {
-                        FinancialMetricCard(
-                            title = "Net Savings",
-                            amount = uiState.netSavings,
-                            icon = Icons.Default.AccountBalance,
-                            color = Color(0xFF2196F3),
-                            change = "+25.8%"
-                        )
-                    }
-                    item {
-                        FinancialMetricCard(
-                            title = "Savings Rate",
-                            amount = uiState.savingsRate,
-                            icon = Icons.Default.Percent,
-                            color = Color(0xFF9C27B0),
-                            change = "+3.2%",
-                            isPercentage = true
+                    items(listOf("This Week", "This Month", "This Year", "All Time")) { period ->
+                        FilterChip(
+                            onClick = { selectedPeriod = period },
+                            label = { Text(period) },
+                            selected = selectedPeriod == period
                         )
                     }
                 }
             }
-            
-            // Spending by Category Chart
+
+            // Key Metrics Cards
             item {
-                ExpensePieChart(
-                    data = uiState.expensesByCategory,
-                    colors = listOf(
-                        Color(0xFF6200EE),
-                        Color(0xFF03DAC6),
-                        Color(0xFFFF6B6B),
-                        Color(0xFF4ECDC4),
-                        Color(0xFF45B7D1),
-                        Color(0xFF96CEB4),
-                        Color(0xFFFD79A8),
-                        Color(0xFFE84393)
+                Column {
+                    SectionHeader(
+                        title = "Key Metrics",
+                        subtitle = selectedPeriod.lowercase()
                     )
-                )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(analyticsCards) { card ->
+                            AnalyticsMetricCard(
+                                card = card,
+                                modifier = Modifier.width(180.dp)
+                            )
+                        }
+                    }
+                }
             }
-            
-            // Monthly Trend Chart
+
+            // Spending Chart Placeholder
             item {
-                SpendingTrendChart(
-                    data = uiState.monthlyTrend
-                )
+                Column {
+                    SectionHeader(
+                        title = "Spending Trends",
+                        subtitle = "Monthly overview"
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    Icons.Default.BarChart,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(48.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    "Spending Chart",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    "Chart implementation goes here",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
             }
-            
-            // Budget Progress Section
+
+            // Category Breakdown
             item {
-                Text(
-                    text = "Budget Progress",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Column {
+                    SectionHeader(
+                        title = "Category Breakdown",
+                        subtitle = "Expense distribution"
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            categoryBreakdown.forEach { (category, percentage, color) ->
+                                CategoryBreakdownItem(
+                                    category = category,
+                                    percentage = percentage,
+                                    color = color
+                                )
+                                if (category != categoryBreakdown.last().first) {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            
-            items(uiState.budgetProgress) { budget ->
-                BudgetProgressChart(
-                    budgetName = budget.name,
-                    spent = budget.spent,
-                    budget = budget.amount
-                )
-            }
-            
-            // Goals Section
+
+            // Financial Goals Progress
             item {
-                Text(
-                    text = "Financial Goals",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Column {
+                    SectionHeader(
+                        title = "Goals Progress",
+                        subtitle = "Your financial targets"
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    GoalsProgressCard()
+                }
             }
-            
-            items(uiState.financialGoals) { goal ->
-                GoalProgressCard(
-                    goal = goal,
-                    onGoalClick = { /* TODO: Navigate to goal details */ }
-                )
-            }
-            
-            // Insights & Recommendations
+
+            // Insights Card
             item {
-                InsightsCard(insights = uiState.insights)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.Default.Psychology,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "AI Insights",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            "• You're spending 15% less on dining compared to last month\n" +
+                            "• Your savings rate improved by 5% this month\n" +
+                            "• Consider setting a budget for entertainment to optimize spending",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+                    }
+                }
             }
-            
+
+            // Bottom spacing
             item {
-                Spacer(modifier = Modifier.height(100.dp))
+                Spacer(modifier = Modifier.height(80.dp))
             }
         }
     }
 }
 
 @Composable
-fun FinancialMetricCard(
-    title: String,
-    amount: Double,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    color: Color,
-    change: String,
-    isPercentage: Boolean = false,
+fun AnalyticsMetricCard(
+    card: AnalyticsCard,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.width(160.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = color.copy(alpha = 0.1f)
+            containerColor = card.color.copy(alpha = 0.1f)
         )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = color,
-                    modifier = Modifier.size(24.dp)
-                )
-                
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(card.color.copy(alpha = 0.2f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = card.icon,
+                        contentDescription = null,
+                        tint = card.color,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = change,
-                    fontSize = 12.sp,
-                    color = if (change.startsWith("+")) Color(0xFF4CAF50) else Color(0xFFF44336),
-                    fontWeight = FontWeight.Medium
+                    text = card.change,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Medium,
+                    color = if (card.isPositive) Color.Green else Color.Red
                 )
             }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = title,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
-            
-            Text(
-                text = if (isPercentage) "${amount.toInt()}%" else String.format(Locale.US, "$%.2f", amount),
-                fontSize = 20.sp,
+                text = card.value,
+                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
-        }
-    }
-}
-
-@Composable
-fun GoalProgressCard(
-    goal: FinancialGoal,
-    onGoalClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        onClick = onGoalClick
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = goal.name,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    
-                    Text(
-                        text = "${String.format(Locale.US, "$%.0f", goal.currentAmount)} of ${String.format(Locale.US, "$%.0f", goal.targetAmount)}",
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                }
-                
-                Text(
-                    text = "${(goal.getProgress() * 100).toInt()}%",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            LinearProgressIndicator(
-                progress = { goal.getProgress() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp),
-                color = MaterialTheme.colorScheme.primary
+            Text(
+                text = card.title,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Remaining: ${String.format(Locale.US, "$%.0f", goal.getRemainingAmount())}",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                
-                Text(
-                    text = if (goal.isOnTrack()) "✅ On track" else "⚠️ Behind",
-                    fontSize = 12.sp,
-                    color = if (goal.isOnTrack()) Color(0xFF4CAF50) else Color(0xFFFF9800)
-                )
-            }
         }
     }
 }
 
 @Composable
-fun InsightsCard(
-    insights: List<String>,
-    modifier: Modifier = Modifier
+fun CategoryBreakdownItem(
+    category: String,
+    percentage: Double,
+    color: Color
 ) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(12.dp)
+                .background(color, CircleShape)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = category,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = "${percentage}%",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
+fun GoalsProgressCard() {
     Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column(
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Psychology,
-                    contentDescription = "Insights",
-                    tint = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.size(24.dp)
-                )
-                
-                Spacer(modifier = Modifier.width(8.dp))
-                
-                Text(
-                    text = "Smart Insights",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            insights.forEach { insight ->
-                Row(
-                    modifier = Modifier.padding(vertical = 4.dp)
-                ) {
-                    Text(
-                        text = "💡",
-                        fontSize = 16.sp
+            listOf(
+                Triple("Emergency Fund", 0.75, "₹75,000 / ₹100,000"),
+                Triple("Vacation Fund", 0.45, "₹22,500 / ₹50,000"),
+                Triple("New Laptop", 0.90, "₹90,000 / ₹100,000")
+            ).forEach { (goal, progress, amount) ->
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = goal,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = "${(progress * 100).toInt()}%",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = progress.toFloat(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(4.dp),
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
                     Text(
-                        text = insight,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        lineHeight = 20.sp
+                        text = amount,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+                if (goal != "New Laptop") {
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
