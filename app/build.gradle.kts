@@ -71,6 +71,20 @@ dependencies {
     // Navigation - using version catalog
     implementation(libs.androidx.navigation.compose)
 
+    // Charts and Visualization
+    implementation(libs.mpandroidchart)
+    implementation(libs.ui.graphics)
+
+    // Additional UI Components
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.animation)
+
+    // Date and Time
+    implementation(libs.kotlinx.datetime)
+
+    // Permissions
+    implementation(libs.accompanist.permissions)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
