@@ -29,6 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.*
 
+val IncomeGreen = Color(0xFF4CAF50)
+val ExpenseRed = Color(0xFFF44336)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BalanceCard(
@@ -43,20 +46,25 @@ fun BalanceCard(
             .fillMaxWidth()
             .clickable { onCardClick() },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(20.dp)
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp,
+            pressedElevation = 8.dp
+        ),
+        shape = MaterialTheme.shapes.large
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    Brush.horizontalGradient(
+                    Brush.linearGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                        )
+                            MaterialTheme.colorScheme.primaryContainer,
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
+                        ),
+                        start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                        end = androidx.compose.ui.geometry.Offset(1000f, 1000f)
                     )
                 )
                 .padding(24.dp)
@@ -64,17 +72,17 @@ fun BalanceCard(
             Column {
                 Text(
                     text = "Current Balance",
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                    fontSize = 14.sp
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "₹${String.format("%.2f", balance)}",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.displayMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -82,12 +90,14 @@ fun BalanceCard(
                     IncomeExpenseItem(
                         title = "Income",
                         amount = income,
-                        icon = Icons.AutoMirrored.Filled.TrendingUp
+                        icon = Icons.AutoMirrored.Filled.TrendingUp,
+                        color = IncomeGreen
                     )
                     IncomeExpenseItem(
                         title = "Expenses",
                         amount = expenses,
-                        icon = Icons.AutoMirrored.Filled.TrendingDown
+                        icon = Icons.AutoMirrored.Filled.TrendingDown,
+                        color = ExpenseRed
                     )
                 }
             }
@@ -100,6 +110,7 @@ private fun IncomeExpenseItem(
     title: String,
     amount: Double,
     icon: ImageVector,
+    color: Color
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -108,7 +119,7 @@ private fun IncomeExpenseItem(
             modifier = Modifier
                 .size(32.dp)
                 .background(
-                    MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
+                    color.copy(alpha = 0.2f),
                     CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -116,7 +127,7 @@ private fun IncomeExpenseItem(
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = color,
                 modifier = Modifier.size(16.dp)
             )
         }
@@ -124,12 +135,12 @@ private fun IncomeExpenseItem(
         Column {
             Text(
                 text = title,
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                 fontSize = 12.sp
             )
             Text(
                 text = "₹${String.format("%.0f", amount)}",
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -150,40 +161,49 @@ fun QuickActionCard(
             .aspectRatio(1f)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = color.copy(alpha = 0.1f)
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         ),
-        shape = RoundedCornerShape(16.dp)
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+            pressedElevation = 6.dp
+        ),
+        shape = MaterialTheme.shapes.large
     ) {
         Column(
             modifier = Modifier
-                .padding(12.dp)
+                .padding(16.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(color.copy(alpha = 0.2f), CircleShape),
-                contentAlignment = Alignment.Center
+            Card(
+                modifier = Modifier.size(48.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = color.copy(alpha = 0.12f)
+                ),
+                shape = CircleShape,
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = title,
+                        tint = color,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = title,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Medium,
+                style = MaterialTheme.typography.labelMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                lineHeight = 12.sp
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

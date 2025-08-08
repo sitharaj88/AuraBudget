@@ -240,18 +240,26 @@ fun EnhancedTopAppBar(
     var searchQuery by remember { mutableStateOf("") }
 
     if (showSearchBar) {
-        // Search Top App Bar
+        // Search Top App Bar with Material Design 3 styling
         TopAppBar(
             title = {
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    placeholder = { Text("Search transactions...") },
+                    placeholder = {
+                        Text(
+                            "Search transactions...",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.extraLarge,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                     )
                 )
             },
@@ -260,158 +268,287 @@ fun EnhancedTopAppBar(
                     showSearchBar = false
                     searchQuery = ""
                 }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Close search")
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Close search",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
                 }
             },
             actions = {
                 IconButton(onClick = {
-                    // Handle search action
                     if (searchQuery.isNotEmpty()) {
                         navController.navigate("${Screen.Transactions.route}?search=$searchQuery")
                     }
                 }) {
-                    Icon(Icons.Default.Search, contentDescription = "Search")
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface
             ),
             modifier = modifier
         )
     } else {
-        // Normal Top App Bar with Enhanced Actions
+        // Enhanced Top App Bar with beautiful Material Design 3 styling
         TopAppBar(
             title = title,
             actions = {
-                // Search Button
-                IconButton(onClick = { showSearchBar = true }) {
+                // Search Button with better styling
+                FilledTonalIconButton(
+                    onClick = { showSearchBar = true },
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                ) {
                     Icon(Icons.Default.Search, contentDescription = "Search")
                 }
 
+                Spacer(modifier = Modifier.width(8.dp))
+
                 // Quick Filter Button
-                IconButton(onClick = { navController.navigate("${Screen.Transactions.route}?filter=recent") }) {
+                FilledTonalIconButton(
+                    onClick = { navController.navigate("${Screen.Transactions.route}?filter=recent") },
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                    )
+                ) {
                     Icon(Icons.Default.FilterList, contentDescription = "Filter")
                 }
 
-                // Notifications
-                IconButton(onClick = { navController.navigate(Screen.Notifications.route) }) {
-                    Icon(Icons.Default.Notifications, contentDescription = "Notifications")
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Notifications with badge indicator
+                BadgedBox(
+                    badge = {
+                        Badge(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        ) {
+                            Text("3", style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+                ) {
+                    IconButton(onClick = { navController.navigate(Screen.Notifications.route) }) {
+                        Icon(
+                            Icons.Default.Notifications,
+                            contentDescription = "Notifications",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
 
-                // More Options Menu
+                // More Options Menu with beautiful dropdown
                 Box {
                     IconButton(onClick = { showMoreMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = "More options",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
 
                     DropdownMenu(
                         expanded = showMoreMenu,
-                        onDismissRequest = { showMoreMenu = false }
+                        onDismissRequest = { showMoreMenu = false },
+                        shape = MaterialTheme.shapes.large,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        shadowElevation = 8.dp,
+                        tonalElevation = 3.dp
                     ) {
                         // Theme Toggle
                         DropdownMenuItem(
-                            text = { Text("Toggle Theme") },
+                            text = {
+                                Text(
+                                    "Toggle Theme",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
                             onClick = {
                                 showMoreMenu = false
                                 // TODO: Toggle theme via ViewModel
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.Brightness4, contentDescription = null)
+                                Icon(
+                                    Icons.Default.Brightness4,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
                             }
                         )
 
                         // Export Data
                         DropdownMenuItem(
-                            text = { Text("Export Data") },
+                            text = {
+                                Text(
+                                    "Export Data",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
                             onClick = {
                                 showMoreMenu = false
                                 // TODO: Implement export functionality
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.CloudDownload, contentDescription = null)
+                                Icon(
+                                    Icons.Default.CloudDownload,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
                             }
                         )
 
                         // Backup & Sync
                         DropdownMenuItem(
-                            text = { Text("Backup & Sync") },
+                            text = {
+                                Text(
+                                    "Backup & Sync",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
                             onClick = {
                                 showMoreMenu = false
                                 // TODO: Navigate to backup settings
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.Backup, contentDescription = null)
+                                Icon(
+                                    Icons.Default.Backup,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.tertiary
+                                )
                             }
                         )
 
-                        Divider()
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                         // Categories Management
                         DropdownMenuItem(
-                            text = { Text("Manage Categories") },
+                            text = {
+                                Text(
+                                    "Manage Categories",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
                             onClick = {
                                 showMoreMenu = false
                                 navController.navigate(Screen.Categories.route)
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.Category, contentDescription = null)
+                                Icon(
+                                    Icons.Default.Category,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
                             }
                         )
 
-                        // Goals (if available)
+                        // Financial Goals
                         DropdownMenuItem(
-                            text = { Text("Financial Goals") },
+                            text = {
+                                Text(
+                                    "Financial Goals",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
                             onClick = {
                                 showMoreMenu = false
-                                navController.navigate("goals") // Assuming you have goals screen
+                                navController.navigate("goals")
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.TrendingUp, contentDescription = null)
+                                Icon(
+                                    Icons.Default.TrendingUp,
+                                    contentDescription = null,
+                                    tint = IncomeGreen
+                                )
                             }
                         )
 
-                        Divider()
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                         // Profile
                         DropdownMenuItem(
-                            text = { Text("Profile") },
+                            text = {
+                                Text(
+                                    "Profile",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
                             onClick = {
                                 showMoreMenu = false
                                 navController.navigate(Screen.Profile.route)
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.AccountCircle, contentDescription = null)
+                                Icon(
+                                    Icons.Default.AccountCircle,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
                             }
                         )
 
                         // Settings
                         DropdownMenuItem(
-                            text = { Text("Settings") },
+                            text = {
+                                Text(
+                                    "Settings",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
                             onClick = {
                                 showMoreMenu = false
                                 navController.navigate(Screen.Settings.route)
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.Settings, contentDescription = null)
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                         )
 
                         // Help & Support
                         DropdownMenuItem(
-                            text = { Text("Help & Support") },
+                            text = {
+                                Text(
+                                    "Help & Support",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
                             onClick = {
                                 showMoreMenu = false
                                 // TODO: Navigate to help screen
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.Help, contentDescription = null)
+                                Icon(
+                                    Icons.Default.Help,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.tertiary
+                                )
                             }
                         )
                     }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
+                actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             modifier = modifier
         )
