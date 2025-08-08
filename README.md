@@ -79,7 +79,7 @@ AuraBudget follows modern Android development best practices with **Clean Archit
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/AuraBudget.git
+   git clone https://github.com/sitharaj88/AuraBudget.git
    cd AuraBudget
    ```
 
@@ -199,8 +199,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Sitharaj**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
+- GitHub: [@sitharaj88](https://github.com/sitharaj88)
+- Email: sitharaj.info@gmail.com
 
 ## 🙏 Acknowledgments
 
